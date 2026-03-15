@@ -19,6 +19,9 @@ import tempfile
 from pathlib import Path
 from typing import Optional
 
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+
 
 def detect_package(command: str) -> Optional[str]:
     """从命令字符串推断 npm 包名。返回包名或 None。"""
@@ -82,7 +85,27 @@ def fetch_source(package: Optional[str], local_path: Optional[str] = None) -> Op
 
 
 async def connect_and_list_tools(command: str) -> list[dict]:
-    raise NotImplementedError
+    """
+    通过 MCP JSON-RPC 协议连接 server，返回 tool 列表。
+    command: 完整命令字符串，如 "npx -y @mcp/server-github"
+    """
+    parts = command.split()
+    cmd = parts[0]
+    cmd_args = parts[1:]
+
+    params = StdioServerParameters(command=cmd, args=cmd_args)
+    async with stdio_client(params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            result = await session.list_tools()
+            return [
+                {
+                    "name": tool.name,
+                    "description": tool.description or "",
+                    "inputSchema": tool.inputSchema or {}
+                }
+                for tool in result.tools
+            ]
 
 
 def _write_output(result: dict, output_path: str):

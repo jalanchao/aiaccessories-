@@ -65,3 +65,58 @@ def test_fetch_source_npm_success_returns_path(tmp_path):
         result = fetch_source("@modelcontextprotocol/server-github")
     assert result is not None
     assert "modelcontextprotocol-server-github" in result
+
+
+import pytest
+from unittest.mock import AsyncMock, MagicMock, patch
+from mcp_inspector import connect_and_list_tools
+
+
+@pytest.mark.asyncio
+async def test_connect_and_list_tools_returns_tool_list():
+    """返回格式正确的 tool 列表。"""
+    mock_tool = MagicMock()
+    mock_tool.name = "search_repos"
+    mock_tool.description = "Search GitHub repositories"
+    mock_tool.inputSchema = {"type": "object", "properties": {"query": {"type": "string"}}}
+
+    mock_session = AsyncMock()
+    mock_session.list_tools.return_value = MagicMock(tools=[mock_tool])
+
+    with patch("mcp_inspector.stdio_client") as mock_ctx, \
+         patch("mcp_inspector.ClientSession") as mock_session_cls:
+        mock_ctx.return_value.__aenter__ = AsyncMock(return_value=(AsyncMock(), AsyncMock()))
+        mock_ctx.return_value.__aexit__ = AsyncMock(return_value=False)
+        mock_session_cls.return_value.__aenter__ = AsyncMock(return_value=mock_session)
+        mock_session_cls.return_value.__aexit__ = AsyncMock(return_value=False)
+
+        result = await connect_and_list_tools("npx -y @mcp/server-github")
+
+    assert len(result) == 1
+    assert result[0]["name"] == "search_repos"
+    assert result[0]["description"] == "Search GitHub repositories"
+    assert "inputSchema" in result[0]
+    mock_session.initialize.assert_awaited_once()
+
+
+@pytest.mark.asyncio
+async def test_connect_and_list_tools_empty_description():
+    """description 为 None 时转为空字符串。"""
+    mock_tool = MagicMock()
+    mock_tool.name = "tool_no_desc"
+    mock_tool.description = None
+    mock_tool.inputSchema = {}
+
+    mock_session = AsyncMock()
+    mock_session.list_tools.return_value = MagicMock(tools=[mock_tool])
+
+    with patch("mcp_inspector.stdio_client") as mock_ctx, \
+         patch("mcp_inspector.ClientSession") as mock_session_cls:
+        mock_ctx.return_value.__aenter__ = AsyncMock(return_value=(AsyncMock(), AsyncMock()))
+        mock_ctx.return_value.__aexit__ = AsyncMock(return_value=False)
+        mock_session_cls.return_value.__aenter__ = AsyncMock(return_value=mock_session)
+        mock_session_cls.return_value.__aexit__ = AsyncMock(return_value=False)
+
+        result = await connect_and_list_tools("npx -y @mcp/server")
+
+    assert result[0]["description"] == ""
