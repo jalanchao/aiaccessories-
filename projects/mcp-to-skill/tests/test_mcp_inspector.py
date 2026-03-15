@@ -120,3 +120,51 @@ async def test_connect_and_list_tools_empty_description():
         result = await connect_and_list_tools("npx -y @mcp/server")
 
     assert result[0]["description"] == ""
+
+
+import json
+import os
+from unittest.mock import patch, AsyncMock, MagicMock
+from mcp_inspector import main
+
+
+def test_main_schema_json_input(tmp_path):
+    """--schema-json 模式：直接读取 JSON，跳过 MCP 连接。"""
+    tools = [{"name": "t1", "description": "d1", "inputSchema": {}}]
+    schema_file = tmp_path / "tools.json"
+    schema_file.write_text(json.dumps(tools))
+    output_file = tmp_path / "inspector.json"
+
+    with patch("sys.argv", [
+        "mcp_inspector.py",
+        "--schema-json", str(schema_file),
+        "--server-name", "my-server",
+        "--output", str(output_file)
+    ]):
+        main()
+
+    result = json.loads(output_file.read_text())
+    assert result["server_name"] == "my-server"
+    assert result["package"] is None
+    assert result["source_path"] is None
+    assert result["tools"] == tools
+
+
+def test_main_command_input(tmp_path):
+    """命令模式：连接 MCP server 并输出 inspector.json。"""
+    output_file = tmp_path / "inspector.json"
+    mock_tools = [{"name": "search", "description": "Search", "inputSchema": {}}]
+
+    with patch("sys.argv", [
+        "mcp_inspector.py",
+        "npx -y @mcp/server-github",
+        "--output", str(output_file)
+    ]), patch("mcp_inspector.connect_and_list_tools", new=AsyncMock(return_value=mock_tools)), \
+       patch("mcp_inspector.detect_package", return_value="@mcp/server-github"), \
+       patch("mcp_inspector.fetch_source", return_value=None):
+        main()
+
+    result = json.loads(output_file.read_text())
+    assert result["server_name"] == "server-github"
+    assert result["package"] == "@mcp/server-github"
+    assert result["tools"] == mock_tools

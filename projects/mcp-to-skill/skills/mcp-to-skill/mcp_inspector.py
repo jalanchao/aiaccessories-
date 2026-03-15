@@ -108,12 +108,70 @@ async def connect_and_list_tools(command: str) -> list[dict]:
             ]
 
 
-def _write_output(result: dict, output_path: str):
-    raise NotImplementedError
-
-
 def main():
-    raise NotImplementedError
+    parser = argparse.ArgumentParser(
+        description="MCP Inspector — 提取 MCP server tool schemas 和源码",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+示例:
+  # 连接已安装的 MCP server
+  python mcp_inspector.py "npx -y @modelcontextprotocol/server-github" --output inspector.json
+
+  # 使用已有 schema JSON（跳过 MCP 连接）
+  python mcp_inspector.py --schema-json tools.json --server-name github
+        """
+    )
+    parser.add_argument("command", nargs="?", help="MCP server 启动命令")
+    parser.add_argument("--schema-json", help="已有 tool schema JSON 文件路径（跳过 MCP 连接）")
+    parser.add_argument("--server-name", help="覆盖 server 名称")
+    parser.add_argument("--output", default="inspector.json", help="输出文件路径（默认：inspector.json）")
+    args = parser.parse_args()
+
+    # 模式 1：直接使用 schema JSON
+    if args.schema_json:
+        with open(args.schema_json) as f:
+            tools = json.load(f)
+        result = {
+            "server_name": args.server_name or "unknown",
+            "package": None,
+            "source_path": None,
+            "tools": tools
+        }
+        _write_output(result, args.output)
+        return
+
+    if not args.command:
+        parser.error("需要提供 'command' 或 '--schema-json'")
+
+    # 模式 2：连接 MCP server
+    tools = asyncio.run(connect_and_list_tools(args.command))
+    package = detect_package(args.command)
+    source_path = fetch_source(package)
+
+    # 推断 server_name：包名末段 或 命令末段
+    if args.server_name:
+        server_name = args.server_name
+    elif package:
+        server_name = package.split("/")[-1]
+    else:
+        server_name = args.command.split()[-1].split("/")[-1]
+
+    result = {
+        "server_name": server_name,
+        "package": package,
+        "source_path": source_path,
+        "tools": tools
+    }
+    _write_output(result, args.output)
+
+
+def _write_output(result: dict, output_path: str):
+    """写入 inspector.json 并打印摘要。"""
+    with open(output_path, "w") as f:
+        json.dump(result, f, indent=2, ensure_ascii=False)
+    tool_count = len(result["tools"])
+    src = result["source_path"] or "（无源码）"
+    print(f"✓ 写入 {output_path}：{tool_count} 个 tool，源码：{src}")
 
 
 if __name__ == "__main__":
