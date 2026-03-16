@@ -52,8 +52,8 @@ def fetch_source(package: Optional[str], local_path: Optional[str] = None) -> Op
     safe_name = package.replace('/', '-').lstrip('@-')
     cache_dir = Path(tempfile.gettempdir()) / "mcp-to-skill-cache" / safe_name
 
-    # 已缓存则直接返回
-    if cache_dir.exists() and any(cache_dir.iterdir()):
+    # 已缓存则直接返回（排除仅含 .tgz 的失败解压目录）
+    if cache_dir.exists() and any(f for f in cache_dir.iterdir() if f.suffix != '.tgz'):
         return str(cache_dir)
 
     cache_dir.mkdir(parents=True, exist_ok=True)
