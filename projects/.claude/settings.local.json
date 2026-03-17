@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx skills:*)",
+      "WebFetch(domain:skills.sh)",
+      "Bash(cd /Users/j/Projects/AIAccessories-/projects/mcp-to-skill && python -m pytest tests/test_mcp_inspector.py::test_detect_package_npx_scoped -v 2>&1)",
+      "Bash(which python3:*)",
+      "Bash(pip3 install:*)",
+      "Bash(cd /Users/j/Projects/AIAccessories-/projects/mcp-to-skill && python3 -m pytest tests/test_mcp_inspector.py::test_detect_package_npx_scoped -v 2>&1)",
+      "Bash(cd /Users/j/Projects/AIAccessories-/projects/mcp-to-skill && python3 -m pytest tests/test_mcp_inspector.py -k \"detect_package\" -v 2>&1)",
+      "Bash(cd /Users/j/Projects/AIAccessories-/projects/mcp-to-skill && python -m pytest tests/test_mcp_inspector.py -k \"detect_package\" -v 2>&1)",
+      "Bash(cd /Users/j/Projects/AIAccessories-/projects/mcp-to-skill && python -m pytest tests/test_mcp_inspector.py -k \"fetch_source\" -v 2>&1)",
+      "Bash(pip install:*)",
+      "Bash(cd /Users/j/Projects/AIAccessories-/projects/mcp-to-skill && python -m pytest tests/test_mcp_inspector.py -k \"connect_and_list\" -v 2>&1)",
+      "Bash(cd /Users/j/Projects/AIAccessories-/projects/mcp-to-skill && python -m pytest tests/test_mcp_inspector.py -v 2>&1)",
+      "Bash(cd /Users/j/Projects/AIAccessories-/projects/mcp-to-skill && python -m pytest tests/test_mcp_inspector.py -k \"test_main\" -v 2>&1)",
+      "Bash(pip show:*)",
+      "Bash(cd /Users/j/Projects/AIAccessories-/projects/mcp-to-skill/skills/mcp-to-skill && python mcp_inspector.py \"npx -y @modelcontextprotocol/server-filesystem /tmp\" --output /tmp/test-inspector.json 2>&1)",
+      "Bash(python3 -c \"\nimport json\nwith open\\('/tmp/test-inspector.json'\\) as f:\n    d = json.load\\(f\\)\nassert d['server_name']\nassert isinstance\\(d['tools'], list\\)\nassert len\\(d['tools']\\) > 0\nassert all\\('name' in t and 'description' in t and 'inputSchema' in t for t in d['tools']\\)\nprint\\(f'OK: {len\\(d[\\\\\"tools\\\\\"]\\)} tools, source_path={d[\\\\\"source_path\\\\\"]}'\\)\n\")",
+      "Bash(cd /Users/j/Projects/AIAccessories-/projects/mcp-to-skill && python -m pytest tests/ -v 2>&1)",
+      "Bash(git add:*)",
+      "Bash(git:*)"
+    ]
+  }
+}
