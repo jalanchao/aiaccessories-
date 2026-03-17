@@ -39,16 +39,15 @@ description: |
 ## 步骤二：运行 mcp_inspector.py（仅非 B 类输入：A 或 C）
 
 定位 `mcp_inspector.py`：它与本 SKILL.md 在同一目录。
-使用 Bash 工具查找其绝对路径，然后用绝对路径执行：
+框架加载本 skill 时会在 system-reminder 中提供 `Base directory for this skill`，
+用该路径构建脚本路径：
 
 ```bash
 # 确认 mcp SDK 已安装
 pip show mcp > /dev/null 2>&1 || pip install mcp
 
-# 查找脚本位置（skill base directory 由框架在 system prompt 中提供）
-# 例：find ~/.claude/skills -name "mcp_inspector.py" 2>/dev/null | head -1
-# 将找到的路径赋给变量
-INSPECTOR_PATH="<上一步确认的绝对路径>/mcp_inspector.py"
+# SKILL_DIR = system-reminder 中 "Base directory for this skill" 的值
+INSPECTOR_PATH="$SKILL_DIR/mcp_inspector.py"
 
 python "$INSPECTOR_PATH" "<MCP命令>" --output /tmp/mcp-inspector-output.json
 ```
