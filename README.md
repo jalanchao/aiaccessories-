@@ -9,6 +9,7 @@
 | 项目 | Skills | 描述 |
 |------|--------|------|
 | [personal-notes](./projects/personal-notes/) | `my-notes` | 个人 Obsidian vault 笔记管理，支持 PARA/Finance/Paper/Personal 多模块路由归档 |
+| [mcp-to-skill](./projects/mcp-to-skill/) | `mcp-to-skill` | 将任意 MCP server 转换为零运行时依赖的 skill 包，自动提取工具 schema 并生成可复用 skill |
 
 ## 快速开始
 
@@ -26,6 +27,8 @@ cp -r projects/personal-notes/skills/personal-notes-skill ~/.claude/skills/my-no
 ```
 AIAccessories-/
 ├── projects/
+│   ├── personal-notes/    ← Obsidian 笔记管理
+│   ├── mcp-to-skill/      ← MCP → Skill 转换工具
 │   └── {project-name}/
 │       ├── skills/        ← Claude Skill 文件（直接可用）
 │       ├── docs/plans/    ← 设计文档与实现计划（按需）
