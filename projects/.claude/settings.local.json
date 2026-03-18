@@ -19,7 +19,8 @@
       "Bash(python3 -c \"\nimport json\nwith open\\('/tmp/test-inspector.json'\\) as f:\n    d = json.load\\(f\\)\nassert d['server_name']\nassert isinstance\\(d['tools'], list\\)\nassert len\\(d['tools']\\) > 0\nassert all\\('name' in t and 'description' in t and 'inputSchema' in t for t in d['tools']\\)\nprint\\(f'OK: {len\\(d[\\\\\"tools\\\\\"]\\)} tools, source_path={d[\\\\\"source_path\\\\\"]}'\\)\n\")",
       "Bash(cd /Users/j/Projects/AIAccessories-/projects/mcp-to-skill && python -m pytest tests/ -v 2>&1)",
       "Bash(git add:*)",
-      "Bash(git:*)"
+      "Bash(git:*)",
+      "WebFetch(domain:github.com)"
     ]
   }
 }
